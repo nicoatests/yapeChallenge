@@ -41,7 +41,7 @@ You must expose an endpoint to **create a transaction**, containing the followin
 
 ## Solution
 
-###Architecture Diagram
+### Architecture Diagram
 
 <img width="831" height="749" alt="yapediagram drawio" src="https://github.com/user-attachments/assets/813b7948-8583-43bb-8992-68e8e12f46bf" />
 
