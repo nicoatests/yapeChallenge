@@ -1,7 +1,7 @@
-﻿using AntifraudYape.Application.Messages.Transactions;
-using AntifraudYape.Infrastructure.Configuration.Options;
+﻿using AntifraudYape.Infrastructure.Configuration.Options;
 using AntifraudYape.Worker.Transactions.Consumers;
 using MassTransit;
+using TransferYape.Application.Messages.Transactions;
 
 namespace AntifraudYape.Worker.Configuration.Extensions;
 

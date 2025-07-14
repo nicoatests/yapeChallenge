@@ -1,4 +1,4 @@
-﻿namespace AntifraudYape.Application.Messages.Transactions;
+﻿namespace TransferYape.Application.Messages.Transactions;
 
 public record TransactionCreated(
     Guid Id,

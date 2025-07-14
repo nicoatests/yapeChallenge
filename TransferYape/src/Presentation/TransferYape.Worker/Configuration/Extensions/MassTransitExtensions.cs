@@ -1,5 +1,5 @@
-﻿using MassTransit;
-using TransferYape.Application.Messages.Transactions;
+﻿using AntifraudYape.Application.Messages.Transactions;
+using MassTransit;
 using TransferYape.Infrastructure.Configuration.Options;
 using TransferYape.Worker.Transactions.Consumers;
 

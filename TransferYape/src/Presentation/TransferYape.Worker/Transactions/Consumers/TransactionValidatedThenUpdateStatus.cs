@@ -1,6 +1,6 @@
-﻿using MassTransit;
+﻿using AntifraudYape.Application.Messages.Transactions;
+using MassTransit;
 using MediatR;
-using TransferYape.Application.Messages.Transactions;
 using TransferYape.Application.Transactions.Commands.UpdateTransactionStatus;
 
 namespace TransferYape.Worker.Transactions.Consumers;

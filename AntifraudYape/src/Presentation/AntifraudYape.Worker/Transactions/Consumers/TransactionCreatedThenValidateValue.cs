@@ -1,7 +1,7 @@
-﻿using AntifraudYape.Application.Messages.Transactions;
-using AntifraudYape.Application.Transactions.Query.GetTransactions;
+﻿using AntifraudYape.Application.Transactions.Query.GetTransactions;
 using MassTransit;
 using MediatR;
+using TransferYape.Application.Messages.Transactions;
 
 namespace AntifraudYape.Worker.Transactions.Consumers;
 public sealed class TransactionCreatedThenValidateValue : IConsumer<TransactionCreated>
