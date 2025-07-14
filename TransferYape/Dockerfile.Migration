@@ -1,0 +1,31 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+
+# Install EF tool
+RUN dotnet tool install --global dotnet-ef --version 9.0.7
+ENV PATH="${PATH}:/root/.dotnet/tools"
+
+# Restore packages
+WORKDIR /src
+
+COPY ["src/Presentation/TransferYape.Presentation/TransferYape.Api/TransferYape.Api.csproj", "src/Presentation/TransferYape.Presentation/TransferYape.Api/"]
+COPY ["src/Application/TransferYape.Application.csproj", "src/Application/"]
+COPY ["src/Domain/TransferYape.Domain.csproj", "src/Domain/"]
+COPY ["src/Infrastructure/TransferYape.Infrastructure/TransferYape.Infrastructure.csproj", "src/Infrastructure/TransferYape.Infrastructure/"]
+COPY ["src/Infrastructure/TransferYape.Persistence.Sql/TransferYape.Persistence.Sql.csproj", "src/Infrastructure/TransferYape.Persistence.Sql/"]
+RUN dotnet restore "./src/Presentation/TransferYape.Presentation/TransferYape.Api/TransferYape.Api.csproj"
+COPY . .
+RUN dotnet build "./src/Presentation/TransferYape.Presentation/TransferYape.Api/TransferYape.Api.csproj" -c Release --no-restore -o /app/build
+
+# Build the migration bundle
+RUN dotnet ef migrations bundle -p src/Infrastructure/TransferYape.Persistence.Sql/TransferYape.Persistence.Sql.csproj -s src/Presentation/TransferYape.Presentation/TransferYape.Api/TransferYape.Api.csproj --configuration Release --self-contained -r linux-x64 --force
+
+FROM mcr.microsoft.com/dotnet/runtime:8.0-jammy AS run
+ENV MIGRATION="1"
+
+WORKDIR /app
+COPY --from=build /src/efbundle .
+COPY --from=build /src/src/Presentation/TransferYape.Presentation/TransferYape.Api/appsettings.* ./
+
+RUN chmod +x ./efbundle
+
+ENTRYPOINT if [ "$MIGRATIONNAME" != "" ]; then ./efbundle "$MIGRATIONNAME"; else ./efbundle ; fi

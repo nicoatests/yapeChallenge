@@ -1,0 +1,124 @@
+services:
+  mssql:
+    container_name: mssql-yape-server
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports:
+      - "5434:1433"
+    environment:
+      - SA_PASSWORD=admin123!
+      - ACCEPT_EULA=Y
+      - MSSQL_PID=Developer
+    volumes: 
+      - mssql-volume:/var/opt/mssql
+    networks:
+      - sv-yape
+  rabbitmq:
+    container_name: rabbitmq-yape-server
+    image: rabbitmq:3.10-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes: 
+      - rabbitmq-volume:/var/lib/rabbitmq
+    networks:
+      - sv-yape
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+  transaction-service-init:
+    container_name: migration
+    build:
+      context: ./TransferYape
+      dockerfile: Dockerfile.Migration
+    environment:
+      - ConnectionStrings__SqlServer=${CONNECTIONSTRING}
+      - BusConfiguration__RabbitMQEnabled=${RABBITMQENABLED}
+      - BusConfiguration__RabbitMQConnectionString=${RABBITMQCONNECTIONSTRING}
+      - BusConfiguration__KafkaConnectionString=${KafkaConnectionString}
+    command: ["./efbundle"]
+    depends_on: 
+      rabbitmq:
+         condition: service_healthy
+      mssql:
+         condition: service_started    
+    networks:
+      - sv-yape
+  transaction-service:
+    container_name: transaction-api
+    build:
+      context: ./TransferYape
+      dockerfile: Dockerfile
+    ports:
+      - "6060:80"
+    environment:
+      - ConnectionStrings__SqlServer=${CONNECTIONSTRING}
+      - BusConfiguration__RabbitMQEnabled=${RABBITMQENABLED}
+      - BusConfiguration__RabbitMQConnectionString=${RABBITMQCONNECTIONSTRING}
+      - BusConfiguration__KafkaConnectionString=${KafkaConnectionString}
+    networks:
+      - sv-yape
+    depends_on:
+      - rabbitmq
+      - mssql
+  transaction-worker:
+    container_name: transaction-worker
+    build:
+      context: ./TransferYape
+      dockerfile: Dockerfile.TransactionWorker
+    environment:
+      - ConnectionStrings__SqlServer=${CONNECTIONSTRING}
+      - BusConfiguration__RabbitMQEnabled=${RABBITMQENABLED}
+      - BusConfiguration__RabbitMQConnectionString=${RABBITMQCONNECTIONSTRING}
+      - BusConfiguration__KafkaConnectionString=${KafkaConnectionString}
+    networks:
+      - sv-yape
+    depends_on:
+      - rabbitmq
+      - mssql
+  antifroud-worker:
+    container_name: antifroud-worker
+    build:
+      context: ./AntifraudYape
+      dockerfile: Dockerfile.AntifraudWorker
+    environment:
+      - ConnectionStrings__SqlServer=${CONNECTIONSTRING}
+      - BusConfiguration__RabbitMQEnabled=${RABBITMQENABLED}
+      - BusConfiguration__RabbitMQConnectionString=${RABBITMQCONNECTIONSTRING}
+      - BusConfiguration__KafkaConnectionString=${KafkaConnectionString}
+    networks:
+      - sv-yape
+    depends_on:
+      - rabbitmq
+      - mssql
+  zookeeper:
+    image: confluentinc/cp-zookeeper:5.5.3
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    networks:
+      - sv-yape
+  kafka:
+    image: confluentinc/cp-enterprise-kafka:5.5.3
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_BROKER_ID: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_JMX_PORT: 9991
+    networks:
+      - sv-yape
+volumes:
+  mssql-volume:
+    driver: local
+  rabbitmq-volume:
+    driver: local
+networks:
+  sv-yape:
+    name: sv-yape
