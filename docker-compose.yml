@@ -60,9 +60,11 @@ services:
       - BusConfiguration__KafkaConnectionString=${KafkaConnectionString}
     networks:
       - sv-yape
-    depends_on:
-      - rabbitmq
-      - mssql
+    depends_on: 
+      rabbitmq:
+         condition: service_healthy
+      mssql:
+         condition: service_started
   transaction-worker:
     container_name: transaction-worker
     build:
@@ -75,9 +77,11 @@ services:
       - BusConfiguration__KafkaConnectionString=${KafkaConnectionString}
     networks:
       - sv-yape
-    depends_on:
-      - rabbitmq
-      - mssql
+    depends_on: 
+      rabbitmq:
+         condition: service_healthy
+      mssql:
+         condition: service_started   
   antifroud-worker:
     container_name: antifroud-worker
     build:
@@ -90,9 +94,11 @@ services:
       - BusConfiguration__KafkaConnectionString=${KafkaConnectionString}
     networks:
       - sv-yape
-    depends_on:
-      - rabbitmq
-      - mssql
+    depends_on: 
+      rabbitmq:
+         condition: service_healthy
+      mssql:
+         condition: service_started
   zookeeper:
     image: confluentinc/cp-zookeeper:5.5.3
     environment:
