@@ -1,8 +1,8 @@
-# 💡 Challenge
+# Challenge
 
-## 📝 Description
+## Description
 
-### 🎯 Anti-fraud
+### Anti-fraud
 
 Every time a financial transaction is created, it must be validated by our **Anti-Fraud Microservice**.  
 Once validated, the same service sends a message back to update the transaction status.
@@ -13,7 +13,7 @@ Currently, we have **three transaction statuses**:
 2. `approved`  
 3. `rejected`
 
-#### ❌ Rejection Criteria:
+Rejection Criteria:
 - Every transaction with a **value greater than 2000**.
 - If the **daily accumulated amount** exceeds **20000**.
 
@@ -21,7 +21,7 @@ Currently, we have **three transaction statuses**:
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - [.NET 8](https://dotnet.microsoft.com/)
 - Any SQL database
@@ -31,7 +31,7 @@ Currently, we have **three transaction statuses**:
 
 ---
 
-## 🧩 Requirements
+## Requirements
 
 You must expose an endpoint to **create a transaction**, containing the following fields:
 
@@ -39,13 +39,13 @@ You must expose an endpoint to **create a transaction**, containing the followin
 
 ---
 
-## ✅ Solution
+## Solution
 
-### 📊 Architecture Diagram
+###Architecture Diagram
 
-_Diagram coming here if needed_
+<img width="831" height="749" alt="yapediagram drawio" src="https://github.com/user-attachments/assets/813b7948-8583-43bb-8992-68e8e12f46bf" />
 
-### 📦 Projects
+### Projects
 
 This repository contains **two microservices**:
 
@@ -56,7 +56,7 @@ This repository contains **two microservices**:
 
 ---
 
-### 🧪 Functionalities
+### Functionalities
 
 #### 🔹 `TransferYape` (Transaction Service)
 
@@ -95,7 +95,7 @@ This repository contains **two microservices**:
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 Run the following to start the environment using Docker:
 
@@ -106,9 +106,9 @@ docker compose --env-file .env.local up -d --build
 
 ---
 
-## ⚙️ Messaging Configuration
+## Messaging Configuration
 
-By default, the system uses **RabbitMQ**, but it's prepared to work with **Kafka**.
+The system uses **RabbitMQ**, but it's prepared to work with **Kafka**.
 
 To switch to Kafka:
 
