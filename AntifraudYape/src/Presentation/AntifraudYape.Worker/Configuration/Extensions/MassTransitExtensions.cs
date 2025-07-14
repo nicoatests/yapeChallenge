@@ -37,7 +37,7 @@ public static class MassTransitExtensions
             {
                 k.Host(kafkaConnectionString);
 
-                k.TopicEndpoint<TransactionCreated>("transaction-validated", "transfer-group", d =>
+                k.TopicEndpoint<TransactionCreated>("transaction-created", "transfer-group", d =>
                 {
                     d.ConfigureConsumer<TransactionCreatedThenValidateValue>(context);
                 });
@@ -51,6 +51,10 @@ public static class MassTransitExtensions
         x.UsingRabbitMq((context, cfg) =>
         {
             cfg.Host(rabbitMQConnectionString);
+            cfg.UseMessageRetry(r =>
+            {
+                r.Interval(3, TimeSpan.FromSeconds(10));
+            });
             cfg.ConfigureEndpoints(context);
         });
     }
