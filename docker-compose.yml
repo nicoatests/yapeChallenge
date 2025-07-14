@@ -22,12 +22,6 @@ services:
       - rabbitmq-volume:/var/lib/rabbitmq
     networks:
       - sv-yape
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
   transaction-service-init:
     container_name: migration
     build:
@@ -39,9 +33,7 @@ services:
       - BusConfiguration__RabbitMQConnectionString=${RABBITMQCONNECTIONSTRING}
       - BusConfiguration__KafkaConnectionString=${KafkaConnectionString}
     command: ["./efbundle"]
-    depends_on: 
-      rabbitmq:
-         condition: service_healthy
+    depends_on:
       mssql:
          condition: service_started    
     networks:
@@ -61,10 +53,8 @@ services:
     networks:
       - sv-yape
     depends_on: 
-      rabbitmq:
-         condition: service_healthy
-      mssql:
-         condition: service_started
+      - rabbitmq
+      - mssql
   transaction-worker:
     container_name: transaction-worker
     build:
@@ -78,10 +68,8 @@ services:
     networks:
       - sv-yape
     depends_on: 
-      rabbitmq:
-         condition: service_healthy
-      mssql:
-         condition: service_started   
+      - rabbitmq
+      - mssql   
   antifroud-worker:
     container_name: antifroud-worker
     build:
@@ -95,10 +83,8 @@ services:
     networks:
       - sv-yape
     depends_on: 
-      rabbitmq:
-         condition: service_healthy
-      mssql:
-         condition: service_started
+      - rabbitmq
+      - mssql
   zookeeper:
     image: confluentinc/cp-zookeeper:5.5.3
     environment:
