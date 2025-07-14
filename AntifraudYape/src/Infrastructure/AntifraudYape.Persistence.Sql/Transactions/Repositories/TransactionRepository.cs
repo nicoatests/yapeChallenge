@@ -1,5 +1,6 @@
 ﻿using AntifraudYape.Application.Transactions.Repositories;
 using AntifraudYape.Domain.Transactions.Entities;
+using AntifraudYape.Domain.Transactions.Enums;
 using AntifraudYape.Persistence.Sql.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,7 +15,8 @@ public sealed class TransactionRepository : ITransactionReadModelRepository
 
     public async Task<IReadOnlyList<Transaction>> GetByDateAsync(DateOnly date, Guid sourceAccountId, CancellationToken cancellationToken = default)
     {
-        return await _dbContext.Transactions.AsNoTracking().Where(t => t.CreatedAt == date && t.SourceAccountId == sourceAccountId)
+        return await _dbContext.Transactions.AsNoTracking().Where(t => t.CreatedAt == date && t.SourceAccountId == sourceAccountId
+        && t.Status != TransactionStatus.Rejected)
             .ToListAsync(cancellationToken);
     }
 }
