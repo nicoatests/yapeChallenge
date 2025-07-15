@@ -43,7 +43,7 @@ You must expose an endpoint to **create a transaction**, containing the followin
 
 ### Architecture Diagram
 
-<img width="831" height="749" alt="yapediagram drawio" src="https://github.com/user-attachments/assets/813b7948-8583-43bb-8992-68e8e12f46bf" />
+<img width="831" height="749" alt="finalimage drawio" src="https://github.com/user-attachments/assets/2986a6ad-516d-47f1-8be2-cadb31f08a75" />
 
 ### Projects
 
